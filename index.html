@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hydrogen Sustainability Landing Page</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <h1>Latest Updates</h1>
+  </header>
+
+  <!-- Image Carousel Section -->
+  <section class="carousel">
+    <button class="arrow left">&#8249;</button>
+    <div class="image-container">
+      <img id="carousel-image" src="" alt="Hydrogen Image">
+    </div>
+    <button class="arrow right">&#8250;</button>
+  </section>
+
+  <script>
+    // 👉 Add your image paths here
+    const imageUrls = [
+      "Images/1.png",
+      "Images/2.png",
+      "Images/3.png",
+      "Images/4.png",
+      "Images/5.png"
+    ];
+
+    let currentIndex = 0;
+    const carouselImage = document.getElementById("carousel-image");
+
+    // Function to update the image
+    const updateImage = () => {
+      carouselImage.src = imageUrls[currentIndex];
+      carouselImage.alt = `Hydrogen Sustainability Image ${currentIndex + 1}`;
+    };
+
+    // Manual navigation
+    document.querySelector(".arrow.left").addEventListener("click", () => {
+      currentIndex = (currentIndex - 1 + imageUrls.length) % imageUrls.length;
+      updateImage();
+    });
+
+    document.querySelector(".arrow.right").addEventListener("click", () => {
+      currentIndex = (currentIndex + 1) % imageUrls.length;
+      updateImage();
+    });
+
+    // Auto-scroll every 5 seconds
+    setInterval(() => {
+      currentIndex = (currentIndex + 1) % imageUrls.length;
+      updateImage();
+    }, 30000);
+
+    // Initialize first image
+    updateImage();
+  </script>
+</body>
+</html>
+
