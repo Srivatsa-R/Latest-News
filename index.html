@@ -39,66 +39,47 @@
       "12.png",
     ];
 
+    // Keep only the last up-to-7, then reverse to show descending (e.g., 12,11,10,9,8,7,6)
+    const imagesDesc = allImages.slice(-7).reverse();
 
-    // Helpers
-    const baseName = (p) => p.split("/").pop();
-    const numericKey = (p) => {
-      const m = baseName(p).match(/\d+/g);
-      return m ? Number(m[m.length - 1]) : NaN; // last number in the filename
-    };
-
-    // Sort by numeric filename ascending (1,2,3,...,12)
-    const sortedAsc = [...allImages].sort((a, b) => {
-      const na = numericKey(a);
-      const nb = numericKey(b);
-      if (!Number.isNaN(na) && !Number.isNaN(nb)) return na - nb;
-      // Fallback: natural sort if no numbers present
-      return baseName(a).localeCompare(baseName(b), undefined, { numeric: true, sensitivity: "base" });
-    });
-
-    // Keep ONLY the last up-to-7 images (highest numbers), then reverse to DESC (12,11,10,...)
-    const takeCount = Math.min(7, sortedAsc.length);
-    const imagesDesc = sortedAsc.slice(-takeCount).reverse();
-
-    // Start with the first of the DESC array (e.g., 12 if you have 1..12)
-    let currentIndex = 0;
+    let currentIndex = 0; // start at the last image (now first in imagesDesc)
     const imgEl = document.getElementById("carousel-image");
 
-    const updateImage = () => {
+    function show() {
       const src = imagesDesc[currentIndex];
       imgEl.src = src;
-      imgEl.alt = baseName(src);
-    };
+      imgEl.alt = src.split("/").pop();
+    }
 
-    // Manual navigation: Right = next in descending list (12 → 11), Left = previous (11 → 12)
+    // Manual navigation: Right = next (12→11), Left = previous (11→12)
     document.querySelector(".arrow.right").addEventListener("click", () => {
       currentIndex = (currentIndex + 1) % imagesDesc.length;
-      updateImage();
+      show();
       resetTimer();
     });
 
     document.querySelector(".arrow.left").addEventListener("click", () => {
       currentIndex = (currentIndex - 1 + imagesDesc.length) % imagesDesc.length;
-      updateImage();
+      show();
       resetTimer();
     });
 
     // Auto-advance every 30 seconds
     let timer = setInterval(() => {
       currentIndex = (currentIndex + 1) % imagesDesc.length;
-      updateImage();
+      show();
     }, 30000);
 
-    const resetTimer = () => {
+    function resetTimer() {
       clearInterval(timer);
       timer = setInterval(() => {
         currentIndex = (currentIndex + 1) % imagesDesc.length;
-        updateImage();
+        show();
       }, 30000);
-    };
+    }
 
     // Initialize
-    updateImage();
+    show();
   </script>
 </body>
 </html>
