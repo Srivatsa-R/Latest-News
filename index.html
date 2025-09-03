@@ -39,63 +39,60 @@
       "12.png",
     ];
 
-  // Helper: get base name (for sorting and alt text)
-    const baseName = (p) => p.split("/").pop();
 
-    // Natural sort by filename (so "10.jpg" comes after "2.jpg")
-    const naturallySorted = [...allImages].sort((a, b) => {
-      const an = baseName(a);
-      const bn = baseName(b);
-      // Natural (numeric) compare where supported
-      if (an.localeCompare) {
-        const cmp = an.localeCompare(bn, undefined, { numeric: true, sensitivity: "base" });
-        if (cmp !== 0) return cmp;
-      }
-      // Fallback: compare last numeric chunk if present
-      const anum = (an.match(/\d+/g) || []).map(Number).pop() ?? -Infinity;
-      const bnum = (bn.match(/\d+/g) || []).map(Number).pop() ?? -Infinity;
-      if (anum !== bnum) return anum - bnum;
-      return an.localeCompare(bn);
+    // Helpers
+    const baseName = (p) => p.split("/").pop();
+    const numericKey = (p) => {
+      const m = baseName(p).match(/\d+/g);
+      return m ? Number(m[m.length - 1]) : NaN; // last number in the filename
+    };
+
+    // Sort by numeric filename ascending (1,2,3,...,12)
+    const sortedAsc = [...allImages].sort((a, b) => {
+      const na = numericKey(a);
+      const nb = numericKey(b);
+      if (!Number.isNaN(na) && !Number.isNaN(nb)) return na - nb;
+      // Fallback: natural sort if no numbers present
+      return baseName(a).localeCompare(baseName(b), undefined, { numeric: true, sensitivity: "base" });
     });
 
-    // Keep ONLY the last 7 (i.e., the highest by name/number)
-    const imageUrls = naturallySorted.slice(-7);
+    // Keep ONLY the last up-to-7 images (highest numbers), then reverse to DESC (12,11,10,...)
+    const takeCount = Math.min(7, sortedAsc.length);
+    const imagesDesc = sortedAsc.slice(-takeCount).reverse();
 
-    // Start with the LAST image first (descending order)
-    let currentIndex = imageUrls.length - 1;
+    // Start with the first of the DESC array (e.g., 12 if you have 1..12)
+    let currentIndex = 0;
     const imgEl = document.getElementById("carousel-image");
 
     const updateImage = () => {
-      const src = imageUrls[currentIndex];
+      const src = imagesDesc[currentIndex];
       imgEl.src = src;
       imgEl.alt = baseName(src);
     };
 
-    // Manual navigation:
-    // Right arrow shows previous in descending sequence (e.g., 15 -> 14)
+    // Manual navigation: Right = next in descending list (12 → 11), Left = previous (11 → 12)
     document.querySelector(".arrow.right").addEventListener("click", () => {
-      currentIndex = (currentIndex - 1 + imageUrls.length) % imageUrls.length;
+      currentIndex = (currentIndex + 1) % imagesDesc.length;
       updateImage();
       resetTimer();
     });
 
-    // Left arrow shows next in descending sequence (e.g., 14 -> 15)
     document.querySelector(".arrow.left").addEventListener("click", () => {
-      currentIndex = (currentIndex + 1) % imageUrls.length;
+      currentIndex = (currentIndex - 1 + imagesDesc.length) % imagesDesc.length;
       updateImage();
       resetTimer();
     });
 
-    // Auto-advance every 30 seconds (descending order)
+    // Auto-advance every 30 seconds
     let timer = setInterval(() => {
-      currentIndex = (currentIndex - 1 + imageUrls.length) % imageUrls.length;
+      currentIndex = (currentIndex + 1) % imagesDesc.length;
       updateImage();
     }, 30000);
 
     const resetTimer = () => {
       clearInterval(timer);
       timer = setInterval(() => {
-        currentIndex = (currentIndex - 1 + imageUrls.length) % imageUrls.length;
+        currentIndex = (currentIndex + 1) % imagesDesc.length;
         updateImage();
       }, 30000);
     };
