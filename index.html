@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hydrogen Sustainability Landing Page</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <h1>Hydrogen Sustainability</h1>
+  </header>
+
+  <!-- Image Carousel Section -->
+  <section class="carousel">
+    <button class="arrow left">&#8249;</button>
+    <div class="image-container">
+      <img id="carousel-image" src="" alt="Hydrogen Image">
+    </div>
+    <button class="arrow right">&#8250;</button>
+  </section>
+
+  <script>
+    // 👉 Add all your image paths here (for example, 1 to 15)
+    const allImages = [
+      "Images/1.png",
+      "Images/2.png",
+      "Images/3.png",
+      "Images/4.png",
+      "Images/5.png",
+      "Images/6.png",
+      "Images/7.png",
+      "Images/8.png",
+      "Images/9.png",
+      "Images/10.png",
+
+    ];
+
+    // Keep only the last 7 images
+    const imageUrls = allImages.slice(-7);
+
+    // Start from the last image
+    let currentIndex = imageUrls.length - 1;
+
+    const carouselImage = document.getElementById("carousel-image");
+
+    const updateImage = () => {
+      carouselImage.src = imageUrls[currentIndex];
+      carouselImage.alt = `Hydrogen Sustainability Image ${currentIndex + 1}`;
+    };
+
+    // Manual navigation
+    document.querySelector(".arrow.left").addEventListener("click", () => {
+      currentIndex = (currentIndex - 1 + imageUrls.length) % imageUrls.length;
+      updateImage();
+    });
+
+    document.querySelector(".arrow.right").addEventListener("click", () => {
+      currentIndex = (currentIndex + 1) % imageUrls.length;
+      updateImage();
+    });
+
+    // Auto-scroll every 30 seconds
+    setInterval(() => {
+      currentIndex = (currentIndex + 1) % imageUrls.length;
+      updateImage();
+    }, 30000);
+
+    // Initialize with the last image
+    updateImage();
+  </script>
+</body>
+</html>
